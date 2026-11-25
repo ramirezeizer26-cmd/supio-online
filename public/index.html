@@ -1,0 +1,866 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>sup.io</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #101820;
+  color: white;
+  font-family: Arial, sans-serif;
+  touch-action: none;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#menu {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #101820, #182c3b);
+  z-index: 20;
+}
+
+.menu-box {
+  width: min(90%, 360px);
+  padding: 28px;
+  border-radius: 18px;
+  background: #1d2c39;
+  box-shadow: 0 15px 50px #0008;
+  text-align: center;
+}
+
+.logo {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.logo span {
+  color: #42df79;
+}
+
+.menu-box p {
+  color: #aab9c5;
+  margin-bottom: 20px;
+}
+
+.menu-box input,
+.menu-box select {
+  width: 100%;
+  padding: 12px;
+  margin: 7px 0;
+  border: 1px solid #415364;
+  border-radius: 9px;
+  background: #101820;
+  color: white;
+  font-size: 16px;
+}
+
+.menu-box button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 9px;
+  background: #42df79;
+  color: #102018;
+  font-weight: bold;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+#connection {
+  margin-top: 14px;
+  color: #ffcc66;
+  font-size: 13px;
+}
+
+#hud {
+  display: none;
+}
+
+.panel {
+  position: fixed;
+  background: #14212dcc;
+  border: 1px solid #ffffff22;
+  border-radius: 10px;
+  padding: 10px;
+  z-index: 5;
+  backdrop-filter: blur(5px);
+}
+
+#instructions {
+  top: 12px;
+  left: 12px;
+  max-width: 220px;
+}
+
+#instructions button,
+#fullscreenBtn {
+  border: 0;
+  border-radius: 7px;
+  background: #2a3c4b;
+  color: white;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+#instructionText {
+  display: none;
+  margin-top: 9px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #d4e0e8;
+}
+
+#leaderboard {
+  top: 12px;
+  right: 12px;
+  width: 175px;
+  font-size: 13px;
+}
+
+#leaderboard h3 {
+  margin-bottom: 7px;
+  font-size: 15px;
+}
+
+#leaderboardList div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 5px 0;
+}
+
+#chat {
+  left: 12px;
+  bottom: 12px;
+  width: min(290px, 45vw);
+}
+
+#chatMessages {
+  height: 110px;
+  overflow-y: auto;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#chatForm {
+  display: flex;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+#chatInput {
+  min-width: 0;
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #415364;
+  border-radius: 6px;
+  background: #101820;
+  color: white;
+}
+
+#chatForm button {
+  border: 0;
+  border-radius: 6px;
+  padding: 8px;
+  background: #42df79;
+  color: #102018;
+  font-weight: bold;
+}
+
+#bottomButtons {
+  position: fixed;
+  right: 15px;
+  bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+}
+
+.gameButton {
+  width: 75px;
+  height: 58px;
+  border: 2px solid #ffffff44;
+  border-radius: 14px;
+  background: #1e3444dd;
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  touch-action: none;
+}
+
+#shootButton {
+  background: #e94b4bdd;
+}
+
+#cloneButton {
+  background: #4b85e9dd;
+}
+
+#fullscreenBtn {
+  position: fixed;
+  top: 12px;
+  left: 235px;
+  z-index: 10;
+}
+
+#status {
+  position: fixed;
+  top: 60px;
+  left: 12px;
+  font-size: 12px;
+  color: #a8e6bd;
+  z-index: 5;
+}
+
+@media (max-width: 600px) {
+  #leaderboard {
+    width: 130px;
+    font-size: 11px;
+  }
+
+  #leaderboard h3 {
+    font-size: 13px;
+  }
+
+  #instructions {
+    max-width: 145px;
+  }
+
+  #instructions button {
+    font-size: 12px;
+  }
+
+  #fullscreenBtn {
+    left: 165px;
+    font-size: 11px;
+    padding: 8px;
+  }
+
+  #chat {
+    width: 43vw;
+  }
+
+  #chatMessages {
+    height: 80px;
+  }
+
+  .gameButton {
+    width: 65px;
+    height: 55px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="menu">
+  <div class="menu-box">
+    <div class="logo">sup<span>.io</span></div>
+    <p>Grow. Shoot. Survive.</p>
+
+    <input id="username" maxlength="16" placeholder="Enter username">
+
+    <label for="color" style="display:block;text-align:left;margin-top:8px">
+      Circle color
+    </label>
+
+    <input id="color" type="color" value="#42df79">
+
+    <button id="playButton">PLAY ONLINE</button>
+
+    <div id="connection">Connecting to game server...</div>
+  </div>
+</div>
+
+<div id="hud">
+
+  <div id="instructions" class="panel">
+    <button id="instructionsButton">☰ Instructions</button>
+    <div id="instructionText">
+      Move your mouse or finger to move.<br>
+      Click or press SHOOT to fire.<br>
+      Press CLONE to create a clone.<br>
+      Eat green dots to grow.<br>
+      Eat smaller players to gain mass.<br>
+      Your view expands as you grow.
+    </div>
+  </div>
+
+  <button id="fullscreenBtn">Fullscreen</button>
+
+  <div id="status">Connecting...</div>
+
+  <div id="leaderboard" class="panel">
+    <h3>🏆 Leaderboard</h3>
+    <div id="leaderboardList"></div>
+  </div>
+
+  <div id="chat" class="panel">
+    <div id="chatMessages"></div>
+
+    <form id="chatForm">
+      <input id="chatInput" maxlength="160" placeholder="Chat..." autocomplete="off">
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <div id="bottomButtons">
+    <button id="shootButton" class="gameButton">SHOOT</button>
+    <button id="cloneButton" class="gameButton">CLONE</button>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const menu = document.getElementById("menu");
+const hud = document.getElementById("hud");
+const connectionText = document.getElementById("connection");
+const statusText = document.getElementById("status");
+
+const leaderboardList = document.getElementById("leaderboardList");
+const chatMessages = document.getElementById("chatMessages");
+
+const WORLD_WIDTH = 6000;
+const WORLD_HEIGHT = 6000;
+
+let socket = null;
+let connected = false;
+let joined = false;
+
+let myId = null;
+let myName = "Player";
+let myColor = "#42df79";
+
+let players = [];
+let dots = [];
+let pellets = [];
+let nukes = [];
+
+let cameraX = WORLD_WIDTH / 2;
+let cameraY = WORLD_HEIGHT / 2;
+let cameraZoom = 1;
+
+let mouseX = innerWidth / 2;
+let mouseY = innerHeight / 2;
+
+let lastShoot = 0;
+
+function resizeCanvas() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  canvas.width = Math.floor(innerWidth * dpr);
+  canvas.height = Math.floor(innerHeight * dpr);
+
+  canvas.style.width = innerWidth + "px";
+  canvas.style.height = innerHeight + "px";
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+function send(data) {
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+  socket.send(JSON.stringify(data));
+}
+
+function getMe() {
+  return players.find(p => String(p.id) === String(myId));
+}
+
+function connect() {
+  const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+  const serverAddress = protocol + "//" + location.host;
+
+  socket = new WebSocket(serverAddress);
+
+  connectionText.textContent = "Connecting to server...";
+
+  socket.addEventListener("open", () => {
+    connected = true;
+    connectionText.textContent = "Connected! Ready to play.";
+  });
+
+  socket.addEventListener("message", event => {
+    let data;
+
+    try {
+      data = JSON.parse(event.data);
+    } catch {
+      return;
+    }
+
+    handleServerMessage(data);
+  });
+
+  socket.addEventListener("close", () => {
+    connected = false;
+    joined = false;
+
+    connectionText.textContent = "Disconnected from server.";
+    statusText.textContent = "Disconnected";
+  });
+
+  socket.addEventListener("error", () => {
+    connectionText.textContent = "Connection error. Check server.";
+  });
+}
+
+function handleServerMessage(data) {
+  switch (data.type) {
+    case "welcome":
+      myId = data.id || data.playerId;
+
+      if (Array.isArray(data.dots)) dots = data.dots;
+      if (Array.isArray(data.players)) players = data.players;
+      if (Array.isArray(data.pellets)) pellets = data.pellets;
+
+      joined = true;
+
+      menu.style.display = "none";
+      hud.style.display = "block";
+
+      statusText.textContent = "Online";
+      break;
+
+    case "state":
+      if (Array.isArray(data.players)) players = data.players;
+      if (Array.isArray(data.pellets)) pellets = data.pellets;
+      if (Array.isArray(data.nukes)) nukes = data.nukes;
+      break;
+
+    case "dotEaten":
+      dots = dots.filter(dot => String(dot.id) !== String(data.id));
+      break;
+
+    case "dotRespawn":
+      if (data.dot) {
+        dots.push(data.dot);
+      }
+      break;
+
+    case "playerJoined":
+      if (data.player) {
+        addChatMessage("System", data.player.name + " joined", "#a8e6bd");
+      }
+      break;
+
+    case "playerLeft":
+      addChatMessage("System", "A player left the game", "#a8e6bd");
+      break;
+
+    case "chat":
+      addChatMessage(data.name, data.text, data.color);
+      break;
+
+    case "nuke":
+      if (data.nuke) nukes.push(data.nuke);
+      break;
+
+    case "gameOver":
+      if (String(data.playerId) === String(myId)) {
+        addChatMessage("System", "You were eaten! Respawning...", "#ff7777");
+      }
+      break;
+  }
+}
+
+document.getElementById("playButton").addEventListener("click", () => {
+  if (!connected) {
+    connectionText.textContent = "Waiting for server connection...";
+    return;
+  }
+
+  myName = document.getElementById("username").value.trim() || "Player";
+  myColor = document.getElementById("color").value || "#42df79";
+
+  send({
+    type: "join",
+    name: myName,
+    color: myColor
+  });
+});
+
+function addChatMessage(name, text, color) {
+  const line = document.createElement("div");
+
+  const nameSpan = document.createElement("span");
+  nameSpan.textContent = name + ": ";
+  nameSpan.style.color = color || "#ffffff";
+  nameSpan.style.fontWeight = "bold";
+
+  const textSpan = document.createElement("span");
+  textSpan.textContent = text;
+
+  line.appendChild(nameSpan);
+  line.appendChild(textSpan);
+
+  chatMessages.appendChild(line);
+
+  while (chatMessages.children.length > 40) {
+    chatMessages.removeChild(chatMessages.firstChild);
+  }
+
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+document.getElementById("chatForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+
+  if (!text || !connected || !joined) return;
+
+  send({
+    type: "chat",
+    text
+  });
+
+  input.value = "";
+});
+
+document.getElementById("instructionsButton").addEventListener("click", () => {
+  const instructionText = document.getElementById("instructionText");
+
+  instructionText.style.display =
+    instructionText.style.display === "block" ? "none" : "block";
+});
+
+document.getElementById("fullscreenBtn").addEventListener("click", async () => {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    } else {
+      await document.exitFullscreen();
+    }
+
+    if (screen.orientation && screen.orientation.lock) {
+      await screen.orientation.lock("landscape").catch(() => {});
+    }
+  } catch (error) {
+    statusText.textContent = "Fullscreen not supported here";
+  }
+});
+
+function updatePointer(event) {
+  const rect = canvas.getBoundingClientRect();
+
+  mouseX = event.clientX - rect.left;
+  mouseY = event.clientY - rect.top;
+}
+
+canvas.addEventListener("pointermove", updatePointer);
+
+canvas.addEventListener("pointerdown", event => {
+  updatePointer(event);
+
+  if (event.pointerType === "mouse" && event.button === 0) {
+    shoot();
+  }
+});
+
+canvas.addEventListener("contextmenu", event => {
+  event.preventDefault();
+});
+
+function screenToWorld(x, y) {
+  return {
+    x: cameraX + (x - innerWidth / 2) / cameraZoom,
+    y: cameraY + (y - innerHeight / 2) / cameraZoom
+  };
+}
+
+function updateAim() {
+  const target = screenToWorld(mouseX, mouseY);
+
+  send({
+    type: "move",
+    x: Math.max(0, Math.min(WORLD_WIDTH, target.x)),
+    y: Math.max(0, Math.min(WORLD_HEIGHT, target.y))
+  });
+}
+
+function shoot() {
+  if (!connected || !joined) return;
+
+  const now = Date.now();
+
+  if (now - lastShoot < 80) return;
+  lastShoot = now;
+
+  // Update aim immediately before firing.
+  updateAim();
+
+  // Send the shooting command immediately.
+  send({
+    type: "shoot"
+  });
+}
+
+function clone() {
+  if (!connected || !joined) return;
+
+  send({
+    type: "clone"
+  });
+}
+
+document.getElementById("shootButton").addEventListener("pointerdown", event => {
+  event.preventDefault();
+  shoot();
+});
+
+document.getElementById("cloneButton").addEventListener("pointerdown", event => {
+  event.preventDefault();
+  clone();
+});
+
+function worldToScreen(x, y) {
+  return {
+    x: (x - cameraX) * cameraZoom + innerWidth / 2,
+    y: (y - cameraY) * cameraZoom + innerHeight / 2
+  };
+}
+
+function drawGrid() {
+  const spacing = 100;
+
+  const left = cameraX - innerWidth / (2 * cameraZoom);
+  const right = cameraX + innerWidth / (2 * cameraZoom);
+  const top = cameraY - innerHeight / (2 * cameraZoom);
+  const bottom = cameraY + innerHeight / (2 * cameraZoom);
+
+  ctx.strokeStyle = "#ffffff0b";
+  ctx.lineWidth = 1;
+
+  for (let x = Math.floor(left / spacing) * spacing; x < right; x += spacing) {
+    const screen = worldToScreen(x, 0);
+
+    ctx.beginPath();
+    ctx.moveTo(screen.x, 0);
+    ctx.lineTo(screen.x, innerHeight);
+    ctx.stroke();
+  }
+
+  for (let y = Math.floor(top / spacing) * spacing; y < bottom; y += spacing) {
+    const screen = worldToScreen(0, y);
+
+    ctx.beginPath();
+    ctx.moveTo(0, screen.y);
+    ctx.lineTo(innerWidth, screen.y);
+    ctx.stroke();
+  }
+}
+
+function drawWorldBorder() {
+  const topLeft = worldToScreen(0, 0);
+  const bottomRight = worldToScreen(WORLD_WIDTH, WORLD_HEIGHT);
+
+  ctx.strokeStyle = "#ffffff55";
+  ctx.lineWidth = 5;
+
+  ctx.strokeRect(
+    topLeft.x,
+    topLeft.y,
+    bottomRight.x - topLeft.x,
+    bottomRight.y - topLeft.y
+  );
+}
+
+function drawDots() {
+  for (const dot of dots) {
+    const pos = worldToScreen(dot.x, dot.y);
+    const radius = Math.max(2, 5 * cameraZoom);
+
+    if (
+      pos.x < -20 || pos.x > innerWidth + 20 ||
+      pos.y < -20 || pos.y > innerHeight + 20
+    ) {
+      continue;
+    }
+
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = dot.color || "#38d96b";
+    ctx.fill();
+  }
+}
+
+function drawPellets() {
+  for (const pellet of pellets) {
+    const pos = worldToScreen(pellet.x, pellet.y);
+    const radius = Math.max(3, Math.sqrt(pellet.mass || 25) * cameraZoom);
+
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = pellet.color || "#ffffff";
+    ctx.fill();
+  }
+}
+
+function drawPlayers() {
+  const sorted = [...players].sort((a, b) => a.mass - b.mass);
+
+  for (const player of sorted) {
+    const pos = worldToScreen(player.x, player.y);
+    const radius = Math.max(8, Math.sqrt(player.mass) * 1.5 * cameraZoom);
+
+    if (
+      pos.x < -radius - 20 || pos.x > innerWidth + radius + 20 ||
+      pos.y < -radius - 20 || pos.y > innerHeight + radius + 20
+    ) {
+      continue;
+    }
+
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = player.color || "#42df79";
+    ctx.fill();
+
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#ffffff55";
+    ctx.stroke();
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.font = "bold " + Math.max(10, 14 * cameraZoom) + "px Arial";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(player.name || "Player", pos.x, pos.y);
+
+    ctx.font = Math.max(9, 11 * cameraZoom) + "px Arial";
+    ctx.fillStyle = "#ffffffcc";
+    ctx.fillText(Math.floor(player.mass), pos.x, pos.y + radius * 0.45);
+
+    if (String(player.id) === String(myId)) {
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, radius + 5, 0, Math.PI * 2);
+      ctx.strokeStyle = "#ffffffaa";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+}
+
+function drawNukes() {
+  const now = Date.now();
+
+  for (const nuke of nukes) {
+    const pos = worldToScreen(nuke.x, nuke.y);
+    const age = now - nuke.start;
+    const radius = Math.min(250, age / 10) * cameraZoom;
+
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = "#ff4d4d";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+  }
+}
+
+function updateCamera() {
+  const me = getMe();
+
+  if (!me) return;
+
+  cameraX = me.x;
+  cameraY = me.y;
+
+  // Larger mass means a wider field of view.
+  cameraZoom = Math.max(
+    0.28,
+    Math.min(1, Math.pow(1000 / Math.max(1000, me.mass), 0.25))
+  );
+
+  statusText.textContent =
+    "Mass: " + Math.floor(me.mass) +
+    " | Players: " + players.length +
+    " | Dots: " + dots.length;
+}
+
+function updateLeaderboard() {
+  const top = [...players]
+    .sort((a, b) => b.mass - a.mass)
+    .slice(0, 3);
+
+  leaderboardList.innerHTML = "";
+
+  top.forEach((player, index) => {
+    const row = document.createElement("div");
+
+    const name = document.createElement("span");
+    name.textContent = (index + 1) + ". " + player.name;
+    name.style.color = player.color || "#ffffff";
+
+    const mass = document.createElement("span");
+    mass.textContent = Math.floor(player.mass);
+
+    row.appendChild(name);
+    row.appendChild(mass);
+
+    leaderboardList.appendChild(row);
+  });
+}
+
+function render() {
+  ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+  ctx.fillStyle = "#101820";
+  ctx.fillRect(0, 0, innerWidth, innerHeight);
+
+  updateCamera();
+
+  drawGrid();
+  drawWorldBorder();
+  drawDots();
+  drawPellets();
+  drawNukes();
+  drawPlayers();
+
+  updateLeaderboard();
+
+  requestAnimationFrame(render);
+}
+
+connect();
+render();
+</script>
+
+</body>
+</html>
