@@ -65,6 +65,52 @@ canvas{
   margin:0;
   color:#62d99a
 }
+#massitsBanner{
+  position:absolute;
+  top:18px;
+  left:18px;
+  z-index:12;
+  background:#101d2c;
+  border:2px solid #62d99a;
+  border-radius:14px;
+  padding:14px 18px;
+  min-width:190px;
+  box-shadow:0 8px 30px #0008;
+}
+#massitsBanner .massitsLabel{
+  color:#9fb1c8;
+  font-size:12px;
+  font-weight:bold;
+  letter-spacing:1.5px;
+}
+#massitsAmount{
+  color:#62d99a;
+  font-size:30px;
+  font-weight:900;
+  margin-top:4px;
+}
+#startupShopButton{
+  position:absolute;
+  top:18px;
+  right:18px;
+  z-index:12;
+  padding:15px 24px;
+  font-size:18px;
+}
+#startupShopModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:20;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  background:#030711dd;
+}
+#startupShopModal .panel{max-height:85vh;overflow:auto}
+#startupShopModal h2{margin-top:0;color:#62d99a}
+#startupShopModal button{width:100%;margin-top:8px}
+#startupShopStatus{min-height:22px;color:#fbbf24;font-size:13px;margin-top:8px}
 #accountScreen p{color:#aab8cc}
 #accountButtons{
   display:flex;
@@ -167,11 +213,15 @@ canvas{
 #deathScreen h1{color:#ff7184}
 .small{font-size:12px;color:#9ca8bb}
 @media(max-width:700px){
-  #shop{width:155px;bottom:165px}
-  #mobileControls{bottom:12px;width:155px}
-  #chat{width:calc(100vw - 185px)}
-  #chatlog{height:75px}
-  #leaderboard{min-width:135px;font-size:11px}
+  #massitsBanner{top:10px;left:10px;min-width:145px;padding:9px 12px}
+  #massitsAmount{font-size:24px}
+  #startupShopButton{top:10px;right:10px;padding:12px 16px;font-size:15px}
+  #shop{width:155px;bottom:165px;max-height:34vh;overflow-y:auto}
+  #mobileControls{bottom:10px;right:10px;width:145px;gap:5px}
+  #mobileControls button{padding:10px;font-size:11px}
+  #chat{width:calc(100vw - 175px);left:10px;bottom:10px}
+  #chatlog{height:65px}
+  #leaderboard{min-width:125px;font-size:10px;right:10px;top:10px}
 }
 </style>
 </head>
@@ -213,6 +263,28 @@ canvas{
       Create an account or log in before playing.
       Offline games do not earn Massits.
     </p>
+  </div>
+</div>
+
+<!-- STARTUP MASSITS DISPLAY AND SHOP -->
+<div id="massitsBanner">
+  <div class="massitsLabel">YOUR MASSITS</div>
+  <div id="massitsAmount">0</div>
+</div>
+<button id="startupShopButton" type="button">SHOP</button>
+
+<div id="startupShopModal">
+  <div class="panel">
+    <h2>SUP.IO SHOP</h2>
+    <p>Use your Massits to unlock special features.</p>
+    <div style="background:#0b1421;border:1px solid #34445c;border-radius:12px;padding:14px">
+      <b>Custom Player Skin</b>
+      <p class="small">Unlock the ability to upload your own PNG, JPG, or GIF player skin.</p>
+      <b>Cost: 1,000 Massits</b>
+      <button id="startupSkinUnlockButton" type="button">UNLOCK CUSTOM SKIN — 1,000 MASSITS</button>
+    </div>
+    <div id="startupShopStatus"></div>
+    <button id="closeStartupShopButton" class="secondary" type="button">CLOSE SHOP</button>
   </div>
 </div>
 
@@ -378,25 +450,26 @@ async function api(path,body=null){
    ACCOUNT
    ========================================================= */
 
+function updateMassitsDisplay(){
+  $("massitsAmount").textContent=Number(massits||0).toLocaleString();
+}
+
 async function refreshAccount(){
   try{
     const data=await api("/api/me");
-    account=data.account || data;
+    account=data.user || data.account || data;
     authenticated=true;
-
-    if(account.massits!==undefined){
-      massits=Number(account.massits)||0;
-    }
-
-    customSkinUnlocked=!!account.customSkinUnlocked;
-
-    $("accountStatus").textContent=
-      "Logged in • Massits: "+massits;
-
+    massits=Number(account.massits)||0;
+    customSkinUnlocked=!!account.skinUnlocked;
+    updateMassitsDisplay();
+    $("accountStatus").textContent="Logged in • Massits: "+massits.toLocaleString();
     return true;
   }catch(e){
     authenticated=false;
     account=null;
+    massits=0;
+    customSkinUnlocked=false;
+    updateMassitsDisplay();
     return false;
   }
 }
@@ -448,6 +521,41 @@ async function checkLogin(){
   }
 }
 checkLogin();
+
+$("startupShopButton").onclick=()=>{
+  $("startupShopStatus").textContent="";
+  $("startupShopModal").style.display="flex";
+};
+$("closeStartupShopButton").onclick=()=>{
+  $("startupShopModal").style.display="none";
+};
+$("startupShopModal").addEventListener("click",e=>{
+  if(e.target===$("startupShopModal")){
+    $("startupShopModal").style.display="none";
+  }
+});
+$("startupSkinUnlockButton").onclick=async()=>{
+  if(!authenticated){
+    $("startupShopStatus").textContent="Please log in first.";
+    return;
+  }
+  if(customSkinUnlocked){
+    $("startupShopStatus").textContent="Custom skins are already unlocked. Upload your skin from the in-game shop.";
+    return;
+  }
+  try{
+    const result=await api("/api/skin/unlock",{});
+    massits=Number(result.massits ?? massits);
+    customSkinUnlocked=true;
+    updateMassitsDisplay();
+    $("startupShopStatus").textContent="Custom skins unlocked! You can upload your image or GIF from the in-game shop.";
+    $("startupSkinUnlockButton").textContent="CUSTOM SKIN UNLOCKED";
+    $("startupSkinUnlockButton").disabled=true;
+    $("accountStatus").textContent="Logged in • Massits: "+massits.toLocaleString();
+  }catch(e){
+    $("startupShopStatus").textContent=e.message;
+  }
+};
 
 /* =========================================================
    GAME START
@@ -552,6 +660,15 @@ function handleServerMessage(data){
       joined=true;
       myId=data.id || data.playerId || null;
       worldSize=data.worldSize || 6000;
+      food=data.food || data.dots || [];
+      if(data.players) players=data.players;
+      if(data.user){
+        account=data.user;
+        massits=Number(data.user.massits)||massits;
+        customSkinUnlocked=!!data.user.skinUnlocked;
+        updateMassitsDisplay();
+      }
+      updateHud();
       notice("Welcome to sup.io!");
       break;
 
@@ -581,6 +698,7 @@ function handleServerMessage(data){
       if(data.massits!==undefined){
         massits=Number(data.massits)||massits;
       }
+      updateMassitsDisplay();
       notice("Cash out complete. Massits: "+massits);
       break;
 
@@ -592,7 +710,17 @@ function handleServerMessage(data){
       break;
 
     case "dotEaten":
+      if(data.dotId!==undefined){
+        food=food.filter(dot=>String(dot.id)!==String(data.dotId));
+      }
+      break;
+
     case "dotRespawn":
+      if(data.dot && !food.some(dot=>String(dot.id)===String(data.dot.id))){
+        food.push(data.dot);
+      }
+      break;
+
     case "playerEaten":
       break;
   }
@@ -836,8 +964,9 @@ $("skinButton").onclick=async()=>{
   if(!customSkinUnlocked){
     try{
       const result=await api("/api/skin/unlock",{});
-      massits=result.massits ?? massits;
+      massits=Number(result.massits ?? massits);
       customSkinUnlocked=true;
+      updateMassitsDisplay();
       notice("Custom skin unlocked!");
     }catch(e){
       notice(e.message);
