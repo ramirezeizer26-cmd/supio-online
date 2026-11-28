@@ -3,563 +3,1218 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>sup.io</title>
+
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101522;color:#fff;font-family:Arial,sans-serif}
-canvas{display:block;width:100%;height:100%;touch-action:none}
-#menu{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#26334c,#101522);z-index:5}
-.panel{width:min(92vw,390px);padding:28px;background:#171e2c;border:1px solid #3b4b66;border-radius:20px;box-shadow:0 20px 70px #0008;text-align:center}
-h1{font-size:42px;margin:0 0 8px;color:#7de5b0}
-p{color:#b9c4d6}
-input,button{font:inherit;border:0;border-radius:10px;padding:13px;margin:7px 0;width:100%}
-input{background:#0e1420;color:white;border:1px solid #39475d}
-button{background:#62d99a;color:#102019;font-weight:bold;cursor:pointer}
-button.secondary{background:#334158;color:white}
-button:disabled{opacity:.45;cursor:not-allowed}
-#hud{position:fixed;inset:0;pointer-events:none}
-.box{position:absolute;background:#101722c9;border:1px solid #334158;border-radius:12px;padding:10px;font-size:14px}
-#leader{right:12px;top:12px;min-width:155px}
-#instructions{left:12px;top:12px;pointer-events:auto;cursor:pointer}
-#chat{left:12px;bottom:12px;width:min(320px,50vw);pointer-events:auto}
-#chatlog{height:110px;overflow:auto;font-size:13px;overflow-wrap:anywhere}
-#chatform{display:flex;gap:5px}
-#chatform input{margin:4px 0;padding:8px}
-#chatform button{width:70px;margin:4px 0;padding:8px}
-#notice{position:absolute;top:20%;left:50%;transform:translateX(-50%);background:#101722e8;padding:10px 16px;border-radius:12px;display:none}
-#mobile{position:fixed;right:12px;bottom:14px;width:130px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
-#mobile button{margin:0;padding:12px;font-size:13px}
-#help{display:none;position:absolute;left:12px;top:55px;max-width:280px;pointer-events:auto}
-#upgradeShop{position:fixed;right:12px;bottom:158px;width:min(245px,48vw);pointer-events:auto}
-#upgradeShop button{display:block;width:100%;margin:6px 0;padding:10px;font-size:12px;line-height:1.25}
-#upgradeShop .shopTitle{font-weight:bold;margin-bottom:5px}
-#upgradeShop .shopStats{font-size:12px;color:#c5d1e2;line-height:1.4}
-@media(max-width:700px){
- #upgradeShop{right:10px;bottom:160px;width:145px}
- #upgradeShop button{padding:8px;font-size:11px}
+body{
+  margin:0;
+  background:#080d16;
+  color:#f3f6fc;
+  font-family:Arial,Helvetica,sans-serif;
+  overflow:hidden
 }
-#deathScreen .panel{border-color:#ff718455}
+button,input,select{
+  font:inherit;
+  border-radius:9px;
+  border:1px solid #34445c;
+  padding:10px;
+}
+button{
+  background:#62d99a;
+  color:#102019;
+  font-weight:bold;
+  cursor:pointer
+}
+button.secondary{
+  background:#273449;
+  color:white
+}
+button:disabled{opacity:.5;cursor:not-allowed}
+input{
+  background:#101927;
+  color:white;
+  width:100%;
+  margin:5px 0
+}
+canvas{
+  display:block;
+  width:100vw;
+  height:100vh
+}
+.panel{
+  width:min(420px,92vw);
+  background:#111a29;
+  border:1px solid #34445c;
+  border-radius:18px;
+  padding:25px;
+  box-shadow:0 20px 70px #0008
+}
+#accountScreen,#deathScreen{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#080d16ee;
+  z-index:10
+}
+#accountScreen h1{
+  font-size:48px;
+  margin:0;
+  color:#62d99a
+}
+#accountScreen p{color:#aab8cc}
+#accountButtons{
+  display:flex;
+  gap:8px;
+  margin-top:10px
+}
+#accountButtons button{flex:1}
+#accountStatus{
+  min-height:22px;
+  font-size:13px;
+  color:#fbbf24
+}
+#hud{
+  display:none;
+  position:fixed;
+  inset:0;
+  pointer-events:none
+}
+.box{
+  position:absolute;
+  background:#101722dc;
+  border:1px solid #334158;
+  border-radius:12px;
+  padding:10px;
+  font-size:13px
+}
+#instructions{
+  top:12px;
+  left:12px;
+  pointer-events:auto;
+  cursor:pointer
+}
+#help{
+  display:none;
+  top:55px;
+  left:12px;
+  max-width:290px;
+  line-height:1.6
+}
+#leaderboard{
+  top:12px;
+  right:12px;
+  min-width:165px
+}
+#chat{
+  bottom:12px;
+  left:12px;
+  width:min(310px,48vw);
+  pointer-events:auto
+}
+#chatlog{
+  height:105px;
+  overflow:auto;
+  overflow-wrap:anywhere;
+  font-size:12px;
+  margin:6px 0
+}
+#chatForm{display:flex;gap:5px}
+#chatInput{margin:0;min-width:0}
+#chatForm button{padding:8px}
+#shop{
+  right:12px;
+  bottom:12px;
+  width:190px;
+  pointer-events:auto
+}
+#shop button{
+  width:100%;
+  margin-top:6px;
+  font-size:12px
+}
+#shopStats{font-size:12px;line-height:1.5}
+#mobileControls{
+  position:fixed;
+  right:12px;
+  bottom:215px;
+  width:150px;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  pointer-events:auto
+}
+#mobileControls button{
+  background:#273449;
+  color:white;
+  padding:12px;
+  font-size:12px
+}
+#notice{
+  position:absolute;
+  top:18%;
+  left:50%;
+  transform:translateX(-50%);
+  display:none;
+  background:#101722ee;
+  padding:12px 18px;
+  border-radius:12px
+}
+#deathScreen{display:none}
 #deathScreen h1{color:#ff7184}
-#respawnBtn{background:#62d99a;color:#102019;font-size:18px}
-@media(min-width:800px){#mobile{width:150px}}
+.small{font-size:12px;color:#9ca8bb}
+@media(max-width:700px){
+  #shop{width:155px;bottom:165px}
+  #mobileControls{bottom:12px;width:155px}
+  #chat{width:calc(100vw - 185px)}
+  #chatlog{height:75px}
+  #leaderboard{min-width:135px;font-size:11px}
+}
 </style>
 </head>
+
 <body>
 
 <canvas id="game"></canvas>
 
-<div id="menu">
- <div class="panel">
-  <h1>sup.io</h1>
-  <p>Online multiplayer circle arena</p>
-  <input id="name" maxlength="18" placeholder="Username" value="Player">
-  <label>Circle color <input id="color" type="color" value="#55cc88"></label>
-  <button id="play">PLAY ONLINE</button>
-  <p id="status">Enter a name to play.</p>
- </div>
-</div>
+<!-- ACCOUNT SCREEN -->
+<div id="accountScreen">
+  <div class="panel">
+    <h1>sup.io</h1>
+    <p>Online circle arena</p>
 
-<div id="deathScreen" style="display:none;position:fixed;inset:0;z-index:8;align-items:center;justify-content:center;background:#080c14eF">
- <div class="panel">
-  <h1>YOU DIED</h1>
-  <p id="deathMessage">Your circle was defeated.</p>
-  <p style="font-size:14px">You will start again with 1000 score.</p>
-  <button id="respawnBtn">RESPAWN</button>
- </div>
-</div>
+    <input id="accountName" maxlength="18" placeholder="Username">
+    <input id="accountPassword" type="password" maxlength="100" placeholder="Password">
 
-<div id="hud" style="display:none">
- <div id="instructions" class="box">INSTRUCTIONS ⓘ</div>
+    <div id="accountButtons">
+      <button id="loginButton">LOGIN</button>
+      <button id="registerButton">REGISTER</button>
+    </div>
 
- <div id="help" class="box">
-  Move your mouse or finger to move.<br>
-  Click or tap to shoot.<br>
-  Upgrade pellet damage in the shop.<br>
-  FIND PLAYER costs 1000 score and launches a tracking ball. It does not damage the opponent.
- </div>
+    <hr style="border-color:#34445c;margin:18px 0">
 
- <div id="leader" class="box">
-  <b>TOP PLAYERS</b>
-  <div id="leaderlist"></div>
- </div>
+    <input id="playerName" maxlength="18" placeholder="Player name in game">
+    <label class="small">Circle color</label>
+    <input id="playerColor" type="color" value="#55cc88">
 
- <div id="chat" class="box">
-  <div><b>ONLINE CHAT</b></div>
-  <div id="chatlog"></div>
-  <form id="chatform">
-   <input id="chatinput" maxlength="120" placeholder="Say something...">
-   <button>SEND</button>
-  </form>
- </div>
+    <button id="onlineButton" style="width:100%;margin-top:8px">
+      PLAY ONLINE
+    </button>
 
- <div id="upgradeShop" class="box">
-  <div class="shopTitle">UPGRADES</div>
-  <div id="shopStats" class="shopStats">
-   Speed bought: 0<br>
-   Damage bought: 0
+    <button id="offlineButton" class="secondary" style="width:100%;margin-top:8px">
+      PLAY OFFLINE
+    </button>
+
+    <div id="accountStatus"></div>
+    <p class="small">
+      Create an account or log in before playing.
+      Offline games do not earn Massits.
+    </p>
   </div>
-  <button id="speedUpgrade">SPEED — 10,000</button>
-  <button id="damageUpgrade">PELLET DAMAGE — 10,000</button>
- </div>
-
- <div id="notice"></div>
 </div>
 
-<div id="mobile" style="display:none">
- <button id="shootBtn">SHOOT</button>
- <button id="findBtn">FIND PLAYER (-1000)</button>
- <button id="fullBtn" class="secondary">FULLSCREEN</button>
+<!-- GAME OVER -->
+<div id="deathScreen">
+  <div class="panel" style="text-align:center">
+    <h1>YOU DIED</h1>
+    <p id="deathMessage">Your circle was defeated.</p>
+    <button id="respawnButton" style="width:100%">RESPAWN</button>
+    <button id="returnButton" class="secondary" style="width:100%;margin-top:8px">
+      BACK TO MENU
+    </button>
+  </div>
+</div>
+
+<!-- GAME HUD -->
+<div id="hud">
+  <div id="instructions" class="box">INSTRUCTIONS ⓘ</div>
+
+  <div id="help" class="box">
+    <b>HOW TO PLAY</b><br>
+    Move your mouse or finger to move.<br>
+    Click or tap to shoot pellets.<br>
+    Eat green dots to gain mass.<br>
+    Absorb smaller circles to gain their mass.<br>
+    FIND PLAYER costs 1000 mass.<br>
+    Find Player does not damage opponents.<br>
+    Upgrade speed or pellet damage in the shop.<br>
+    1000 online mass can be cashed out as 1 Massit.<br>
+    Offline mode does not earn Massits.
+  </div>
+
+  <div id="leaderboard" class="box">
+    <b>TOP 3 PLAYERS</b>
+    <div id="leaderRows">Waiting for players...</div>
+  </div>
+
+  <div id="chat" class="box">
+    <b>CHAT</b>
+    <div id="chatlog"></div>
+    <form id="chatForm">
+      <input id="chatInput" maxlength="120" placeholder="Say something...">
+      <button type="submit">SEND</button>
+    </form>
+  </div>
+
+  <div id="shop" class="box">
+    <b>UPGRADES</b>
+    <div id="shopStats">Speed: 0<br>Damage: 0</div>
+    <button id="speedButton">SPEED — 10,000</button>
+    <button id="damageButton">PELLET DAMAGE — 10,000</button>
+    <button id="findButton" class="secondary">FIND PLAYER — 1,000</button>
+    <button id="cashoutButton" class="secondary">QUIT & CASH OUT</button>
+    <button id="skinButton" class="secondary">CUSTOM SKIN — 1,000 MASSITS</button>
+    <input id="skinFile" type="file" accept="image/png,image/jpeg,image/gif" style="display:none">
+    <button id="bountyButton" class="secondary">CREATE BOUNTY</button>
+  </div>
+
+  <div id="mobileControls">
+    <button id="shootButton">SHOOT</button>
+    <button id="mobileFindButton">FIND PLAYER</button>
+    <button id="fullButton">FULLSCREEN</button>
+  </div>
+
+  <div id="notice"></div>
 </div>
 
 <script>
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
+"use strict";
 
-const menu=document.getElementById("menu");
-const hud=document.getElementById("hud");
-const statusEl=document.getElementById("status");
-const leaderlist=document.getElementById("leaderlist");
-const chatlog=document.getElementById("chatlog");
-const noticeEl=document.getElementById("notice");
+/* =========================================================
+   SUP.IO CLIENT
+   Online game communicates with server.js.
+   ========================================================= */
 
-let socket=null;
-let connected=false;
-let joined=false;
-let myId=null;
-let worldSize=6000;
+const $ = id => document.getElementById(id);
 
-let players=[];
-let food=[];
-let pellets=[];
-let findBalls=[];
+const canvas = $("game");
+const ctx = canvas.getContext("2d");
 
-let mouse={x:innerWidth/2,y:innerHeight/2};
-let me=null;
-let noticeTimer=null;
+let socket = null;
+let connected = false;
+let joined = false;
+let authenticated = false;
+
+let myId = null;
+let worldSize = 6000;
+
+let players = [];
+let food = [];
+let pellets = [];
+let findBalls = [];
+
+let mode = "online";
+let running = false;
+let dead = false;
+
+let mouse = {
+  x: innerWidth / 2,
+  y: innerHeight / 2
+};
+
+let lastShoot = 0;
+let lastMove = 0;
+let lastState = 0;
+
+let me = null;
+let offlineBots = [];
+let offlineFood = [];
+
+let account = null;
+let massits = 0;
+let customSkinUnlocked = false;
+
+let camera = {x:0,y:0,zoom:1};
 
 function resize(){
- canvas.width=innerWidth*devicePixelRatio;
- canvas.height=innerHeight*devicePixelRatio;
- canvas.style.width=innerWidth+"px";
- canvas.style.height=innerHeight+"px";
- ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  canvas.width = innerWidth * devicePixelRatio;
+  canvas.height = innerHeight * devicePixelRatio;
+  ctx.setTransform(
+    devicePixelRatio,0,0,
+    devicePixelRatio,0,0
+  );
 }
 addEventListener("resize",resize);
 resize();
 
-function send(o){
- if(socket&&socket.readyState===WebSocket.OPEN){
-  socket.send(JSON.stringify(o));
- }
+function send(data){
+  if(socket && socket.readyState === WebSocket.OPEN){
+    socket.send(JSON.stringify(data));
+  }
 }
 
-function showNotice(t){
- noticeEl.textContent=t;
- noticeEl.style.display="block";
- clearTimeout(noticeTimer);
- noticeTimer=setTimeout(()=>{
-  noticeEl.style.display="none";
- },2500);
+function notice(message){
+  const el = $("notice");
+  el.textContent = message;
+  el.style.display = "block";
+  clearTimeout(notice.timer);
+  notice.timer = setTimeout(()=>el.style.display="none",3000);
 }
 
-function getMe(){
- return players.find(p=>String(p.id)===String(myId));
+async function api(path,body=null){
+  const options={
+    method:body?"POST":"GET",
+    credentials:"include",
+    headers:{}
+  };
+  if(body){
+    options.headers["Content-Type"]="application/json";
+    options.body=JSON.stringify(body);
+  }
+
+  const response=await fetch(path,options);
+  const data=await response.json().catch(()=>({}));
+
+  if(!response.ok){
+    throw new Error(data.error || data.message || "Request failed");
+  }
+  return data;
 }
 
-function connect(){
- const protocol=location.protocol==="https:"?"wss:":"ws:";
- socket=new WebSocket(protocol+"//"+location.host);
+/* =========================================================
+   ACCOUNT
+   ========================================================= */
 
- statusEl.textContent="Connecting...";
+async function refreshAccount(){
+  try{
+    const data=await api("/api/me");
+    account=data.account || data;
+    authenticated=true;
 
- socket.onopen=()=>{
-  connected=true;
-  statusEl.textContent="Connected. Joining...";
-  send({
-   type:"join",
-   name:document.getElementById("name").value.trim()||"Player",
-   color:document.getElementById("color").value
-  });
- };
+    if(account.massits!==undefined){
+      massits=Number(account.massits)||0;
+    }
 
- socket.onmessage=e=>{
-  let d;
-  try{d=JSON.parse(e.data)}catch{return}
+    customSkinUnlocked=!!account.customSkinUnlocked;
 
-  if(d.type==="welcome"){
-   myId=d.id||d.playerId;
-   worldSize=d.worldSize||6000;
-   food=d.food||[];
-   players=d.players||[];
-   joined=true;
+    $("accountStatus").textContent=
+      "Logged in • Massits: "+massits;
 
-   menu.style.display="none";
-   document.getElementById("deathScreen").style.display="none";
-   hud.style.display="block";
-   document.getElementById("mobile").style.display="flex";
+    return true;
+  }catch(e){
+    authenticated=false;
+    account=null;
+    return false;
+  }
+}
 
-   showNotice("Welcome back to sup.io!");
-   updateUpgradeShop();
+async function register(){
+  const username=$("accountName").value.trim();
+  const password=$("accountPassword").value;
+
+  if(!username || !password){
+    $("accountStatus").textContent="Enter a username and password.";
+    return;
   }
 
-  else if(d.type==="state"){
-   players=d.players||players;
-   pellets=d.pellets||[];
-   findBalls=d.findBalls||[];
-   me=getMe();
-   updateLeaderboard();
-   updateUpgradeShop();
+  try{
+    await api("/api/register",{username,password});
+    await refreshAccount();
+    $("accountStatus").textContent="Account created. You are logged in.";
+  }catch(e){
+    $("accountStatus").textContent=e.message;
+  }
+}
+
+async function login(){
+  const username=$("accountName").value.trim();
+  const password=$("accountPassword").value;
+
+  if(!username || !password){
+    $("accountStatus").textContent="Enter a username and password.";
+    return;
   }
 
-  else if(d.type==="playerJoined"){
-   if(d.player&&!players.some(p=>p.id===d.player.id)){
-    players.push(d.player);
-   }
+  try{
+    await api("/api/login",{username,password});
+    await refreshAccount();
+    $("accountStatus").textContent="Logged in successfully.";
+  }catch(e){
+    $("accountStatus").textContent=e.message;
+  }
+}
+
+$("registerButton").onclick=register;
+$("loginButton").onclick=login;
+
+async function checkLogin(){
+  const ok=await refreshAccount();
+  if(ok){
+    $("accountStatus").textContent=
+      "Logged in • Massits: "+massits;
+  }
+}
+checkLogin();
+
+/* =========================================================
+   GAME START
+   ========================================================= */
+
+function startGame(selectedMode){
+  if(!authenticated){
+    $("accountStatus").textContent="Please register or log in first.";
+    return;
   }
 
-  else if(d.type==="playerLeft"||d.type==="playerEaten"){
-   const id=d.id||d.eatenId;
-   players=players.filter(p=>String(p.id)!==String(id));
+  const name=$("playerName").value.trim() ||
+             $("accountName").value.trim() ||
+             "Player";
+
+  mode=selectedMode;
+  dead=false;
+  running=true;
+
+  $("accountScreen").style.display="none";
+  $("deathScreen").style.display="none";
+  $("hud").style.display="block";
+
+  $("chatlog").innerHTML="";
+  $("leaderRows").textContent="Connecting...";
+  players=[];
+  food=[];
+  pellets=[];
+  findBalls=[];
+
+  if(mode==="online"){
+    connectOnline(name);
+  }else{
+    startOffline(name);
   }
 
-  else if(d.type==="dotEaten"){
-   food=food.filter(f=>f.id!==d.dotId);
+  requestAnimationFrame(loop);
+}
+
+$("onlineButton").onclick=()=>startGame("online");
+$("offlineButton").onclick=()=>startGame("offline");
+
+/* =========================================================
+   ONLINE CONNECTION
+   ========================================================= */
+
+function connectOnline(name){
+  const protocol=location.protocol==="https:"?"wss://":"ws://";
+  const url=protocol+location.host;
+
+  try{
+    socket=new WebSocket(url);
+  }catch(e){
+    notice("Could not connect to server.");
+    return;
   }
 
-  else if(d.type==="dotRespawn"){
-   if(d.dot)food.push(d.dot);
-  }
-
-  else if(d.type==="died"){
-   joined=false;
-   players=players.filter(p=>String(p.id)!==String(myId));
-   myId=null;
-
-   hud.style.display="none";
-   document.getElementById("mobile").style.display="none";
-   menu.style.display="none";
-
-   document.getElementById("deathMessage").textContent=
-    d.reason==="pellet"
-    ?`A pellet hit you for ${d.damage||350} damage and reduced your score to 0.`
-    :"You were absorbed by another player.";
-
-   document.getElementById("deathScreen").style.display="flex";
-  }
-
-  else if(d.type==="chat"){
-   addChat(d.name,d.color,d.text);
-  }
-
-  else if(d.type==="notice"){
-   showNotice(d.text);
-  }
- };
-
- socket.onerror=()=>{
-  statusEl.textContent="Connection error. Check the server.";
- };
-
- socket.onclose=()=>{
   connected=false;
   joined=false;
-  statusEl.textContent="Disconnected. Refresh to reconnect.";
- };
+
+  socket.onopen=()=>{
+    connected=true;
+    notice("Connected. Joining game...");
+    // The browser automatically sends the session cookie
+    // when connecting to the same website.
+    send({
+      type:"join",
+      name:name.slice(0,18),
+      color:$("playerColor").value
+    });
+  };
+
+  socket.onmessage=event=>{
+    let data;
+    try{
+      data=JSON.parse(event.data);
+    }catch(e){
+      return;
+    }
+    handleServerMessage(data);
+  };
+
+  socket.onclose=()=>{
+    connected=false;
+    joined=false;
+    notice("Disconnected from server.");
+  };
+
+  socket.onerror=()=>{
+    notice("Connection error. Check your Railway server.");
+  };
 }
 
-document.getElementById("play").onclick=()=>{
- if(!connected&&!socket){
-  connect();
- }else if(!joined){
-  statusEl.textContent="Connecting to server...";
- }
-};
+function handleServerMessage(data){
+  switch(data.type){
 
-document.getElementById("respawnBtn").onclick=()=>{
- if(!socket||socket.readyState!==WebSocket.OPEN){
-  document.getElementById("deathMessage").textContent=
-   "Connection lost. Refresh the page to reconnect.";
-  return;
- }
+    case "authRequired":
+      notice("Please log in again.");
+      break;
 
- document.getElementById("deathScreen").style.display="none";
+    case "welcome":
+      joined=true;
+      myId=data.id || data.playerId || null;
+      worldSize=data.worldSize || 6000;
+      notice("Welcome to sup.io!");
+      break;
 
- send({
-  type:"join",
-  name:document.getElementById("name").value.trim()||"Player",
-  color:document.getElementById("color").value
- });
-};
+    case "state":
+      if(data.players) players=data.players;
+      if(data.food) food=data.food;
+      if(data.dots) food=data.dots;
+      if(data.pellets) pellets=data.pellets;
+      if(data.findBalls) findBalls=data.findBalls;
+      lastState=performance.now();
+      updateHud();
+      break;
 
-document.getElementById("instructions").onclick=()=>{
- const h=document.getElementById("help");
- h.style.display=h.style.display==="block"?"none":"block";
-};
+    case "notice":
+      notice(data.message || data.text || "Notice");
+      break;
 
-function updateLeaderboard(){
- const top=[...players]
-  .sort((a,b)=>(b.mass||0)-(a.mass||0))
-  .slice(0,3);
+    case "chat":
+      addChat(data.name || "Player",data.text || "");
+      break;
 
- leaderlist.innerHTML=top.map((p,i)=>
-  `${i+1}. ${escapeHtml(p.name)} — ${Math.round(p.mass||0)}`
- ).join("<br>");
+    case "died":
+      showDeath(data.message || "You were absorbed.");
+      break;
+
+    case "cashoutDone":
+      if(data.massits!==undefined){
+        massits=Number(data.massits)||massits;
+      }
+      notice("Cash out complete. Massits: "+massits);
+      break;
+
+    case "playerJoined":
+      notice((data.player?.name || "A player")+" joined.");
+      break;
+
+    case "playerLeft":
+      break;
+
+    case "dotEaten":
+    case "dotRespawn":
+    case "playerEaten":
+      break;
+  }
 }
 
-function updateUpgradeShop(){
- const p=getMe();
- if(!p)return;
+/* =========================================================
+   OFFLINE MODE
+   1 player + 9 bots
+   Offline score never earns Massits.
+   ========================================================= */
 
- const speedCount=p.speedUpgrades||0;
- const damageCount=p.damageUpgrades||0;
-
- const speedCost=10000+speedCount*5000;
- const damageCost=10000+damageCount*5000;
-
- document.getElementById("shopStats").innerHTML=
-  `Score: ${Math.round(p.mass||0)}<br>`+
-  `Speed bought: ${speedCount}<br>`+
-  `Damage bought: ${damageCount}<br>`+
-  `Current pellet damage: ${p.pelletDamage||350}`;
-
- document.getElementById("speedUpgrade").textContent=
-  `SPEED +1 (Bought ${speedCount}) — ${speedCost.toLocaleString()}`;
-
- document.getElementById("damageUpgrade").textContent=
-  `PELLET +50 (Bought ${damageCount}) — ${damageCost.toLocaleString()}`;
-
- document.getElementById("speedUpgrade").disabled=
-  (p.mass||0)<speedCost;
-
- document.getElementById("damageUpgrade").disabled=
-  (p.mass||0)<damageCost;
+function random(min,max){
+  return Math.random()*(max-min)+min;
 }
 
-function escapeHtml(s){
- return String(s).replace(/[&<>"']/g,c=>({
-  "&":"&amp;",
-  "<":"&lt;",
-  ">":"&gt;",
-  '"':"&quot;",
-  "'":"&#39;"
- }[c]));
+function makeOfflinePlayer(name,color,x,y,mass=1000,bot=false){
+  return {
+    id:bot?"bot"+Math.random().toString(36).slice(2):"offlinePlayer",
+    name,
+    color,
+    x,y,
+    mass,
+    bot,
+    speedUpgrades:0,
+    damageUpgrades:0,
+    pelletDamage:350,
+    playerSpeed:3.2,
+    vx:0,vy:0,
+    skin:null
+  };
 }
 
-function addChat(name,color,text){
- const line=document.createElement("div");
+function startOffline(name){
+  worldSize=6000;
+  const colors=[
+    "#55cc88","#f87171","#60a5fa","#facc15",
+    "#c084fc","#fb923c","#2dd4bf","#f472b6"
+  ];
 
- line.innerHTML=
-  `<b style="color:${/^#[0-9a-f]{6}$/i.test(color)?color:"#fff"}">`+
-  `${escapeHtml(name)}:</b> ${escapeHtml(text)}`;
+  me=makeOfflinePlayer(
+    name,
+    $("playerColor").value,
+    worldSize/2,
+    worldSize/2,
+    1000,
+    false
+  );
 
- chatlog.appendChild(line);
- chatlog.scrollTop=chatlog.scrollHeight;
+  players=[me];
+  offlineBots=[];
+  offlineFood=[];
+  pellets=[];
+  findBalls=[];
+
+  for(let i=0;i<9;i++){
+    const bot=makeOfflinePlayer(
+      "Bot "+(i+1),
+      colors[i%colors.length],
+      random(0,worldSize),
+      random(0,worldSize),
+      random(500,1800),
+      true
+    );
+    offlineBots.push(bot);
+    players.push(bot);
+  }
+
+  for(let i=0;i<4500;i++){
+    offlineFood.push({
+      x:random(0,worldSize),
+      y:random(0,worldSize),
+      r:5,
+      color:"#00f000"
+    });
+  }
+
+  notice("Offline mode • 9 bots • no Massits earned");
 }
 
-document.getElementById("chatform").onsubmit=e=>{
- e.preventDefault();
+/* =========================================================
+   MOVEMENT AND INPUT
+   ========================================================= */
 
- const input=document.getElementById("chatinput");
-
- send({
-  type:"chat",
-  text:input.value
- });
-
- input.value="";
-};
-
-function aim(e){
- const r=canvas.getBoundingClientRect();
- mouse.x=e.clientX-r.left;
- mouse.y=e.clientY-r.top;
+function getMe(){
+  if(mode==="offline") return me;
+  return players.find(p=>p.id===myId) || null;
 }
 
-canvas.addEventListener("pointermove",e=>{
- aim(e);
- sendMove();
+function worldMouse(){
+  return {
+    x:camera.x+(mouse.x-innerWidth/2)/camera.zoom,
+    y:camera.y+(mouse.y-innerHeight/2)/camera.zoom
+  };
+}
+
+canvas.addEventListener("mousemove",e=>{
+  mouse.x=e.clientX;
+  mouse.y=e.clientY;
 });
 
-canvas.addEventListener("pointerdown",e=>{
- aim(e);
- if(e.pointerType==="touch"){
-  sendMove();
-  shoot();
- }else{
-  shoot();
- }
-});
+canvas.addEventListener("touchmove",e=>{
+  if(e.touches.length){
+    mouse.x=e.touches[0].clientX;
+    mouse.y=e.touches[0].clientY;
+  }
+},{passive:true});
 
-function sendMove(){
- if(!joined||!me)return;
+function moveOnline(){
+  if(!connected || !joined || dead) return;
 
- const zoom=getZoom();
- const cam=camera();
+  const now=performance.now();
+  if(now-lastMove<40)return;
+  lastMove=now;
 
- const wx=cam.x+(mouse.x-innerWidth/2)/zoom;
- const wy=cam.y+(mouse.y-innerHeight/2)/zoom;
-
- send({
-  type:"move",
-  x:wx,
-  y:wy
- });
+  const target=worldMouse();
+  send({type:"move",x:target.x,y:target.y});
 }
-
-function camera(){
- return me?{x:me.x,y:me.y}:{x:worldSize/2,y:worldSize/2};
-}
-
-function getZoom(){
- if(!me)return 1;
-
- return Math.max(
-  .25,
-  Math.min(1,Math.pow(1000/Math.max(1000,me.mass),.25))
- );
-}
-
-let lastShoot=0;
 
 function shoot(){
- if(!joined)return;
+  if(dead)return;
 
- const n=Date.now();
- if(n-lastShoot<80)return;
-
- lastShoot=n;
- sendMove();
- send({type:"shoot"});
+  if(mode==="online"){
+    if(!connected || !joined)return;
+    send({type:"shoot"});
+  }else{
+    offlineShoot();
+  }
 }
 
-function findPlayer(){
- if(!joined)return;
+function offlineShoot(){
+  if(!me)return;
 
- sendMove();
- send({type:"findPlayer"});
+  const target=worldMouse();
+  const dx=target.x-me.x;
+  const dy=target.y-me.y;
+  const d=Math.hypot(dx,dy)||1;
+
+  pellets.push({
+    x:me.x+dx/d*(radius(me)+8),
+    y:me.y+dy/d*(radius(me)+8),
+    vx:dx/d*8,
+    vy:dy/d*8,
+    damage:me.pelletDamage,
+    owner:me.id,
+    life:100
+  });
 }
 
-document.getElementById("shootBtn").onclick=shoot;
-document.getElementById("findBtn").onclick=findPlayer;
-
-document.getElementById("speedUpgrade").onclick=()=>{
- send({type:"upgrade",upgrade:"speed"});
-};
-
-document.getElementById("damageUpgrade").onclick=()=>{
- send({type:"upgrade",upgrade:"damage"});
-};
-
-document.getElementById("fullBtn").onclick=()=>{
- if(document.documentElement.requestFullscreen){
-  document.documentElement.requestFullscreen();
- }
-};
-
-addEventListener("keydown",e=>{
- if(e.code==="Space"){
-  e.preventDefault();
+canvas.addEventListener("click",e=>{
+  if(e.target!==canvas)return;
   shoot();
- }
-
- if(e.key.toLowerCase()==="f"){
-  findPlayer();
- }
 });
 
-function drawCircle(x,y,r,color){
- ctx.beginPath();
- ctx.arc(x,y,r,0,Math.PI*2);
- ctx.fillStyle=color;
- ctx.fill();
+$("shootButton").onclick=shoot;
+
+function findPlayer(){
+  if(dead)return;
+
+  if(mode==="online"){
+    if(!connected || !joined)return;
+    send({type:"findPlayer"});
+  }else{
+    if(me.mass<1000){
+      notice("You need 1000 mass.");
+      return;
+    }
+    me.mass-=1000;
+    notice("Find Player used.");
+  }
 }
 
-function frame(){
- requestAnimationFrame(frame);
- ctx.clearRect(0,0,innerWidth,innerHeight);
+$("findButton").onclick=findPlayer;
+$("mobileFindButton").onclick=findPlayer;
 
- if(!joined){
-  ctx.fillStyle="#101522";
-  ctx.fillRect(0,0,innerWidth,innerHeight);
-  return;
- }
+/* =========================================================
+   UPGRADES
+   ========================================================= */
 
- me=getMe();
+function upgrade(type){
+  if(mode==="online"){
+    if(!connected || !joined)return;
+    send({type:"upgrade",upgrade:type});
+  }else{
+    const cost=10000+(
+      type==="speed"?me.speedUpgrades:me.damageUpgrades
+    )*5000;
 
- const cam=camera();
- const zoom=getZoom();
+    if(me.mass<cost){
+      notice("Not enough mass.");
+      return;
+    }
 
- ctx.save();
- ctx.translate(innerWidth/2,innerHeight/2);
- ctx.scale(zoom,zoom);
- ctx.translate(-cam.x,-cam.y);
+    me.mass-=cost;
 
- // Background and grid
- ctx.fillStyle="#121a28";
- ctx.fillRect(0,0,worldSize,worldSize);
+    if(type==="speed"){
+      me.speedUpgrades++;
+      me.playerSpeed+=1;
+    }else{
+      me.damageUpgrades++;
+      me.pelletDamage+=50;
+    }
+  }
+}
 
- ctx.strokeStyle="#243246";
- ctx.lineWidth=1/zoom;
+$("speedButton").onclick=()=>upgrade("speed");
+$("damageButton").onclick=()=>upgrade("damage");
 
- for(let x=0;x<=worldSize;x+=100){
+/* =========================================================
+   CHAT
+   ========================================================= */
+
+function addChat(name,text){
+  const row=document.createElement("div");
+  row.textContent=name+": "+text;
+  $("chatlog").appendChild(row);
+  $("chatlog").scrollTop=$("chatlog").scrollHeight;
+}
+
+$("chatForm").addEventListener("submit",e=>{
+  e.preventDefault();
+
+  const text=$("chatInput").value.trim();
+  if(!text)return;
+
+  if(mode==="online"){
+    send({type:"chat",text});
+  }else{
+    addChat(me.name,text);
+  }
+
+  $("chatInput").value="";
+});
+
+/* =========================================================
+   CUSTOM SKIN
+   ========================================================= */
+
+$("skinButton").onclick=async()=>{
+  if(!authenticated)return;
+
+  if(!customSkinUnlocked){
+    try{
+      const result=await api("/api/skin/unlock",{});
+      massits=result.massits ?? massits;
+      customSkinUnlocked=true;
+      notice("Custom skin unlocked!");
+    }catch(e){
+      notice(e.message);
+      return;
+    }
+  }
+
+  $("skinFile").click();
+};
+
+$("skinFile").onchange=async()=>{
+  const file=$("skinFile").files[0];
+  if(!file)return;
+
+  if(file.size>2*1024*1024){
+    notice("Skin must be 2 MB or smaller.");
+    return;
+  }
+
+  const form=new FormData();
+  form.append("skin",file);
+
+  try{
+    const response=await fetch("/api/skin/upload",{
+      method:"POST",
+      credentials:"include",
+      body:form
+    });
+
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error||"Upload failed");
+
+    notice("Skin uploaded!");
+  }catch(e){
+    notice(e.message);
+  }
+};
+
+/* =========================================================
+   BOUNTIES
+   ========================================================= */
+
+$("bountyButton").onclick=async()=>{
+  if(mode!=="online"){
+    notice("Bounties are online only.");
+    return;
+  }
+
+  const amount=Number(prompt("How many Massits do you want to put on the bounty?"));
+
+  if(!Number.isInteger(amount)||amount<=0){
+    notice("Enter a valid Massit amount.");
+    return;
+  }
+
+  const target=prompt("Enter the wanted player's username:");
+  if(!target)return;
+
+  try{
+    await api("/api/bounties",{amount,target});
+    notice("Bounty created!");
+  }catch(e){
+    notice(e.message);
+  }
+};
+
+/* =========================================================
+   CASH OUT
+   ========================================================= */
+
+$("cashoutButton").onclick=()=>{
+  if(mode!=="online"){
+    notice("Offline mass cannot be cashed out.");
+    return;
+  }
+
+  if(!connected || !joined){
+    notice("You are not connected.");
+    return;
+  }
+
+  if(!confirm("Quit and cash out your online mass into Massits?"))return;
+
+  send({type:"cashout"});
+};
+
+/* =========================================================
+   UI BUTTONS
+   ========================================================= */
+
+$("instructions").onclick=()=>{
+  const help=$("help");
+  help.style.display=help.style.display==="block"?"none":"block";
+};
+
+$("fullButton").onclick=()=>{
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen?.();
+  }else{
+    document.exitFullscreen?.();
+  }
+};
+
+$("respawnButton").onclick=()=>{
+  $("deathScreen").style.display="none";
+  dead=false;
+
+  if(mode==="online"){
+    send({type:"join",name:$("playerName").value,color:$("playerColor").value});
+  }else{
+    startOffline($("playerName").value||"Player");
+  }
+};
+
+$("returnButton").onclick=()=>{
+  running=false;
+  if(socket){
+    socket.close();
+    socket=null;
+  }
+  connected=false;
+  joined=false;
+  $("hud").style.display="none";
+  $("deathScreen").style.display="none";
+  $("accountScreen").style.display="flex";
+  refreshAccount();
+};
+
+function showDeath(message){
+  dead=true;
+  $("deathMessage").textContent=message;
+  $("deathScreen").style.display="flex";
+}
+
+/* =========================================================
+   OFFLINE BOT AI
+   ========================================================= */
+
+function updateOffline(dt){
+  if(!me || dead)return;
+
+  const target=worldMouse();
+  const dx=target.x-me.x;
+  const dy=target.y-me.y;
+  const d=Math.hypot(dx,dy);
+
+  if(d>radius(me)){
+    const speed=me.playerSpeed||3.2;
+    me.x+=dx/d*speed*dt;
+    me.y+=dy/d*speed*dt;
+  }
+
+  for(const bot of offlineBots){
+    if(bot.mass<=0)continue;
+
+    let nearest=null;
+    let nearestDist=Infinity;
+
+    for(const p of players){
+      if(p===bot || p.mass<=0)continue;
+      const dist=Math.hypot(p.x-bot.x,p.y-bot.y);
+      if(dist<nearestDist){
+        nearestDist=dist;
+        nearest=p;
+      }
+    }
+
+    if(nearest){
+      const bx=nearest.x-bot.x;
+      const by=nearest.y-bot.y;
+      const bd=Math.hypot(bx,by)||1;
+
+      // Bots pursue smaller circles and avoid larger circles.
+      const direction=nearest.mass<bot.mass?1:-1;
+      bot.x+=bx/bd*2.5*dt*direction;
+      bot.y+=by/bd*2.5*dt*direction;
+
+      if(nearestDist<700 && Math.random()<0.015){
+        const vx=bx/bd*7;
+        const vy=by/bd*7;
+        pellets.push({
+          x:bot.x,y:bot.y,vx,vy,
+          damage:350,owner:bot.id,life:90
+        });
+      }
+    }
+  }
+
+  for(const dot of offlineFood){
+    if(Math.hypot(dot.x-me.x,dot.y-me.y)<radius(me)){
+      me.mass+=100;
+      dot.x=random(0,worldSize);
+      dot.y=random(0,worldSize);
+    }
+  }
+
+  for(const bot of offlineBots){
+    if(bot.mass<=0)continue;
+
+    for(const dot of offlineFood){
+      if(Math.hypot(dot.x-bot.x,dot.y-bot.y)<radius(bot)){
+        // Bots do not grow in normal offline play.
+        dot.x=random(0,worldSize);
+        dot.y=random(0,worldSize);
+      }
+    }
+
+    const distance=Math.hypot(bot.x-me.x,bot.y-me.y);
+
+    if(distance<radius(bot)+radius(me)){
+      if(bot.mass>me.mass){
+        showDeath("A bot absorbed you.");
+        return;
+      }else{
+        bot.mass=0;
+        me.mass+=bot.mass;
+      }
+    }
+  }
+
+  for(const p of pellets){
+    p.x+=p.vx*dt;
+    p.y+=p.vy*dt;
+    p.life-=dt;
+  }
+  pellets=pellets.filter(p=>p.life>0);
+}
+
+/* =========================================================
+   DRAWING
+   ========================================================= */
+
+function radius(p){
+  return Math.sqrt(Math.max(1,p.mass))*2.5;
+}
+
+function drawCircle(p){
+  if(!p || p.mass<=0)return;
+
+  const r=radius(p);
+
   ctx.beginPath();
-  ctx.moveTo(x,0);
-  ctx.lineTo(x,worldSize);
-  ctx.stroke();
- }
+  ctx.arc(p.x,p.y,r,0,Math.PI*2);
+  ctx.fillStyle=p.color||"#55cc88";
+  ctx.fill();
 
- for(let y=0;y<=worldSize;y+=100){
-  ctx.beginPath();
-  ctx.moveTo(0,y);
-  ctx.lineTo(worldSize,y);
-  ctx.stroke();
- }
-
- ctx.strokeStyle="#64758c";
- ctx.lineWidth=8/zoom;
- ctx.strokeRect(0,0,worldSize,worldSize);
-
- for(const f of food){
-  drawCircle(f.x,f.y,5,"#64e88e");
- }
-
- for(const b of pellets){
-  drawCircle(b.x,b.y,7,"#ffcf5a");
- }
-
- for(const b of findBalls){
-  drawCircle(b.x,b.y,13,"#ff6d7e");
-
-  ctx.strokeStyle="#ffe2e6";
   ctx.lineWidth=3;
-  ctx.beginPath();
-  ctx.arc(b.x,b.y,18,0,Math.PI*2);
-  ctx.stroke();
- }
-
- for(const p of players){
-  const r=Math.sqrt(Math.max(1,p.mass)*.45);
-
-  drawCircle(p.x,p.y,r,p.color||"#55cc88");
-
-  ctx.strokeStyle="#ffffff55";
-  ctx.lineWidth=3/zoom;
+  ctx.strokeStyle="#ffffff35";
   ctx.stroke();
 
-  ctx.fillStyle="#fff";
-  ctx.font=`${Math.max(14,r*.25)}px Arial`;
+  ctx.fillStyle="white";
   ctx.textAlign="center";
-  ctx.fillText(p.name,p.x,p.y+5);
+  ctx.font="bold "+Math.max(12,r/3)+"px Arial";
+  ctx.fillText(p.name||"Player",p.x,p.y+4);
 
-  ctx.font=`${Math.max(12,r*.18)}px Arial`;
-  ctx.fillText(Math.round(p.mass),p.x,p.y+22);
- }
-
- ctx.restore();
+  ctx.font="12px Arial";
+  ctx.fillText(Math.floor(p.mass),p.x,p.y+20);
 }
 
-frame();
+function drawFood(){
+  const list=mode==="offline"?offlineFood:food;
+
+  for(const dot of list){
+    ctx.beginPath();
+    ctx.arc(dot.x,dot.y,dot.r||5,0,Math.PI*2);
+    ctx.fillStyle=dot.color||"#00f000";
+    ctx.fill();
+  }
+}
+
+function drawPellets(){
+  for(const p of pellets){
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,7,0,Math.PI*2);
+    ctx.fillStyle="#facc15";
+    ctx.fill();
+  }
+}
+
+function updateCamera(){
+  const p=getMe();
+  if(!p)return;
+
+  camera.x=p.x;
+  camera.y=p.y;
+
+  camera.zoom=Math.max(
+    0.35,
+    Math.min(1,1000/Math.max(1000,p.mass))
+  );
+}
+
+function drawWorld(){
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+
+  const p=getMe();
+  if(!p)return;
+
+  updateCamera();
+
+  ctx.save();
+  ctx.translate(innerWidth/2,innerHeight/2);
+  ctx.scale(camera.zoom,camera.zoom);
+  ctx.translate(-camera.x,-camera.y);
+
+  ctx.fillStyle="#0b1220";
+  ctx.fillRect(0,0,worldSize,worldSize);
+
+  ctx.strokeStyle="#243349";
+  ctx.lineWidth=4;
+  ctx.strokeRect(0,0,worldSize,worldSize);
+
+  drawFood();
+  drawPellets();
+
+  for(const player of players){
+    drawCircle(player);
+  }
+
+  ctx.restore();
+}
+
+function updateHud(){
+  const p=getMe();
+  if(!p)return;
+
+  const sorted=[...players]
+    .filter(x=>x.mass>0)
+    .sort((a,b)=>b.mass-a.mass)
+    .slice(0,3);
+
+  $("leaderRows").innerHTML=sorted.map((p,i)=>
+    "<div>"+(i+1)+". "+
+    escapeHtml(p.name||"Player")+
+    " — "+Math.floor(p.mass)+"</div>"
+  ).join("");
+
+  $("shopStats").innerHTML=
+    "Speed: "+(p.speedUpgrades||0)+
+    "<br>Damage: "+(p.damageUpgrades||0)+
+    "<br>Pellet damage: "+(p.pelletDamage||350)+
+    "<br>Massits: "+massits;
+}
+
+function escapeHtml(text){
+  return String(text).replace(/[&<>"']/g,c=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[c]));
+}
+
+/* =========================================================
+   MAIN LOOP
+   ========================================================= */
+
+let previous=performance.now();
+
+function loop(now){
+  if(!running)return;
+
+  const dt=Math.min(2,(now-previous)/16.67);
+  previous=now;
+
+  if(mode==="online"){
+    moveOnline();
+  }else{
+    updateOffline(dt);
+  }
+
+  drawWorld();
+  updateHud();
+
+  requestAnimationFrame(loop);
+}
 </script>
 </body>
 </html>
